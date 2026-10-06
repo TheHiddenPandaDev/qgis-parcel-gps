@@ -42,7 +42,7 @@ class ParcelGpsPlugin:
     def _toggle_dock(self, visible: bool) -> None:
         if self.dock is None:
             self.dock = ParcelGpsDock(self.iface, self.iface.mainWindow())
-            self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dock)
+            self.iface.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dock)
             self.dock.visibilityChanged.connect(self._sync_action)
         self.dock.setVisible(visible)
 

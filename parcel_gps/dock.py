@@ -141,7 +141,7 @@ class ParcelGpsDock(QDockWidget):
         layout = QVBoxLayout(box)
         row = QHBoxLayout()
         self.key_edit = QLineEdit()
-        self.key_edit.setEchoMode(QLineEdit.Password)
+        self.key_edit.setEchoMode(QLineEdit.EchoMode.Password)
         self.key_edit.setPlaceholderText(tr("Paste your Parcel GPS API key"))
         save = QPushButton(tr("Save"))
         save.clicked.connect(self._save_key)
@@ -179,7 +179,7 @@ class ParcelGpsDock(QDockWidget):
         box = QGroupBox(tr("Batch from a table"))
         form = QFormLayout(box)
         self.layer_combo = QgsMapLayerComboBox()
-        self.layer_combo.setFilters(QgsMapLayerProxyModel.VectorLayer)
+        self.layer_combo.setFilters(QgsMapLayerProxyModel.Filter.VectorLayer)
         self.reference_field = QgsFieldComboBox()
         self.country_field = QgsFieldComboBox()
         self.country_field.setAllowEmptyFieldName(True)
@@ -214,9 +214,9 @@ class ParcelGpsDock(QDockWidget):
     def _rich_label(self, text: str = "") -> QLabel:
         label = QLabel(text)
         label.setWordWrap(True)
-        label.setTextFormat(Qt.RichText)
+        label.setTextFormat(Qt.TextFormat.RichText)
         label.setOpenExternalLinks(True)
-        label.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        label.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
         return label
 
     def _restore(self) -> None:
@@ -293,7 +293,7 @@ class ParcelGpsDock(QDockWidget):
 
     def _rows(self, layer, reference_field: str, country_field: str):
         request = QgsFeatureRequest()
-        request.setFlags(QgsFeatureRequest.NoGeometry)
+        request.setFlags(QgsFeatureRequest.Flag.NoGeometry)
         features = layer.getSelectedFeatures(request) if self.selected_only.isChecked() else layer.getFeatures(request)
         for feature in features:
             country = _plain(feature[country_field]) if country_field else None
@@ -307,7 +307,7 @@ class ParcelGpsDock(QDockWidget):
                 count=count
             ),
         )
-        return answer == QMessageBox.Yes
+        return answer == QMessageBox.StandardButton.Yes
 
     def _busy(self) -> bool:
         if self._task is None:
@@ -348,7 +348,9 @@ class ParcelGpsDock(QDockWidget):
             return
         job, error = outcome.job, outcome.error
         QgsMessageLog.logMessage(
-            f"{job.reference} ({job.country or 'auto'}): {error.kind} - {error.message}", LOG_TAG, Qgis.Warning
+            f"{job.reference} ({job.country or 'auto'}): {error.kind} - {error.message}",
+            LOG_TAG,
+            Qgis.MessageLevel.Warning,
         )
 
     def _on_done(self, task: FetchTask) -> None:
@@ -381,7 +383,7 @@ class ParcelGpsDock(QDockWidget):
         if len(summary.failures) > MAX_LISTED_FAILURES:
             lines.append(tr("All failures are listed in the Parcel GPS tab of the log panel."))
         self._show_status("<br>".join(lines), error=bool(summary.failed or summary.stopped_by))
-        level = Qgis.Warning if summary.failed else Qgis.Success
+        level = Qgis.MessageLevel.Warning if summary.failed else Qgis.MessageLevel.Success
         self._iface.messageBar().pushMessage(
             tr("Parcel GPS"),
             tr("Fetched {fetched} of {total} parcels.").format(fetched=summary.fetched, total=summary.total),
@@ -443,7 +445,7 @@ class ParcelGpsDock(QDockWidget):
         result = QgsVectorFileWriter.writeAsVectorFormatV3(
             layer, path, QgsProject.instance().transformContext(), options
         )
-        if result[0] == QgsVectorFileWriter.NoError:
+        if result[0] == QgsVectorFileWriter.WriterError.NoError:
             self._show_status(tr("Results saved to {path}").format(path=html.escape(path)))
         else:
             self._show_status(

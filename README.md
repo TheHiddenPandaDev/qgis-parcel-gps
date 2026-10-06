@@ -55,7 +55,7 @@ key take a while: the plugin waits and carries on by itself.
 [releases page](https://github.com/TheHiddenPandaDev/qgis-parcel-gps/releases), then in QGIS go to
 *Plugins > Manage and Install Plugins > Install from ZIP*.
 
-Requires QGIS 3.22 or later. No extra Python packages are needed. Requests go through the QGIS
+Works on QGIS 3.22 or later and on QGIS 4 (Qt6). No extra Python packages are needed. Requests go through the QGIS
 network stack, so your proxy and SSL settings apply.
 
 ## Use

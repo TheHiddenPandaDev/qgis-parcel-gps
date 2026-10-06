@@ -20,13 +20,13 @@ def qgis_transport(url: str, headers: Mapping[str, str], timeout: float) -> Http
     blocking = QgsBlockingNetworkRequest()
     outcome = blocking.get(request, True)
     reply = blocking.reply()
-    status = reply.attribute(QNetworkRequest.HttpStatusCodeAttribute)
+    status = reply.attribute(QNetworkRequest.Attribute.HttpStatusCodeAttribute)
     if status is not None and int(status) > 0:
         response_headers = {
             bytes(name).decode("latin-1"): bytes(reply.rawHeader(name)).decode("latin-1")
             for name in reply.rawHeaderList()
         }
         return HttpResponse(int(status), bytes(reply.content()), response_headers)
-    if outcome == QgsBlockingNetworkRequest.TimeoutError:
+    if outcome == QgsBlockingNetworkRequest.ErrorCode.TimeoutError:
         raise TransportTimeout(blocking.errorMessage())
     raise TransportFailure(blocking.errorMessage() or "Network request failed")

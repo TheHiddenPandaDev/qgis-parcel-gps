@@ -23,7 +23,7 @@ class FetchTask(QgsTask):
         jobs: list[BatchJob],
         point: tuple[float, float] | None = None,
     ) -> None:
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description, QgsTask.Flag.CanCancel)
         self._api_key = api_key
         self._jobs = jobs
         self._point = point
