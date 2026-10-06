@@ -4,7 +4,9 @@ A QGIS plugin that adds **official cadastral parcels from 29 European countries*
 polygons, with their reference, country, area, municipality and source. It uses the
 [Parcel GPS API](https://www.parcelgps.com/developers).
 
-![A parcel fetched with Parcel GPS over satellite imagery](docs/map.jpg)
+![Parcel 9872023VH5797S0001WX in Santa Cruz de Mudela, Spain, fetched with Parcel GPS in QGIS 4](docs/map.jpg)
+
+*Real result in QGIS 4.2. Imagery: Esri, Maxar, Earthstar Geographics.*
 
 - **By reference**: type a cadastral reference (the country is detected, or pick it).
 - **On the map**: click anywhere and get the parcel under the cursor, in any project CRS.
