@@ -15,7 +15,7 @@ from qgis.core import (
     QgsVectorFileWriter,
 )
 from qgis.gui import QgsFieldComboBox, QgsMapLayerComboBox, QgsMapToolEmitPoint
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import QLocale, Qt
 from qgis.PyQt.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -36,17 +36,36 @@ from qgis.PyQt.QtWidgets import (
 from .core.batch import BatchJob, BatchSummary, build_jobs, clean_reference
 from .core.client import DEVELOPER_PORTAL_URL
 from .core.countries import COUNTRY_CODES, PUBLIC_COUNTRY_COUNT, country_label, normalize_country
+from .basemap import (
+    BASEMAP_MARKER,
+    CADASTRE_MARKER,
+    add_cadastre_overlay,
+    ensure_basemap,
+    framed_extent,
+    owned_layer,
+    remove_cadastre_overlay,
+    replace_basemap,
+    use_web_mercator,
+)
 from .core.errors import AmbiguousReferenceError
+from .core.presentation import (
+    BASEMAP_NONE,
+    BASEMAP_SATELLITE,
+    BASEMAP_STREETS,
+    basemap_for,
+    detail_rows,
+    offers_cadastre_overlay,
+)
 from .fetch_task import FetchTask
 from .i18n import tr
-from .results_layer import add_records, find_results_layer, to_canvas_extent
-from .settings_store import load_api_key, load_country, save_api_key, save_country
+from .results_layer import add_records, find_results_layer
+from .settings_store import load_api_key, load_basemap, load_country, save_api_key, save_basemap, save_country
 
 LOG_TAG = "Parcel GPS"
 WGS84 = "EPSG:4326"
 CONFIRM_BATCH_ABOVE = 25
 MAX_LISTED_FAILURES = 5
-ZOOM_MARGIN = 1.6
+MUTED_COLOR = "#64748b"
 SAVE_DRIVERS = {
     ".gpkg": "GPKG",
     ".geojson": "GeoJSON",
@@ -117,13 +136,16 @@ class ParcelGpsDock(QDockWidget):
         layout.addWidget(self._build_key_box())
         layout.addWidget(self._build_search_box())
         layout.addWidget(self._build_batch_box())
+        layout.addWidget(self._build_map_box())
         self.progress = QProgressBar()
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
         self.status_label = self._rich_label()
+        self.details_label = self._rich_label()
+        self.details_label.setVisible(False)
         self.quota_label = self._rich_label()
         self.source_label = self._rich_label()
-        for label in (self.status_label, self.quota_label, self.source_label):
+        for label in (self.status_label, self.details_label, self.quota_label, self.source_label):
             layout.addWidget(label)
         layout.addLayout(self._build_result_buttons())
         footer = self._rich_label(
@@ -201,6 +223,23 @@ class ParcelGpsDock(QDockWidget):
         form.addRow(row)
         return box
 
+    def _build_map_box(self) -> QGroupBox:
+        box = QGroupBox(tr("Map"))
+        form = QFormLayout(box)
+        self.basemap_combo = QComboBox()
+        self.basemap_combo.addItem(tr("Satellite (Esri)"), BASEMAP_SATELLITE)
+        self.basemap_combo.addItem(tr("Street map (OpenStreetMap)"), BASEMAP_STREETS)
+        self.basemap_combo.addItem(tr("None"), BASEMAP_NONE)
+        form.addRow(tr("Basemap"), self.basemap_combo)
+        self.attribution_label = self._rich_label()
+        self.attribution_label.setStyleSheet(f"color: {MUTED_COLOR};")
+        form.addRow(self.attribution_label)
+        self.cadastre_check = QCheckBox(tr("Show official cadastre layer"))
+        self.cadastre_check.setVisible(False)
+        self.cadastre_check.toggled.connect(self._toggle_cadastre)
+        form.addRow(self.cadastre_check)
+        return box
+
     def _build_result_buttons(self) -> QHBoxLayout:
         row = QHBoxLayout()
         zoom = QPushButton(tr("Zoom to results"))
@@ -223,6 +262,9 @@ class ParcelGpsDock(QDockWidget):
         self.key_edit.setText(load_api_key())
         index = self.country_combo.findData(load_country())
         self.country_combo.setCurrentIndex(max(index, 0))
+        self.basemap_combo.setCurrentIndex(max(self.basemap_combo.findData(load_basemap()), 0))
+        self._show_attribution()
+        self.basemap_combo.currentIndexChanged.connect(self._on_basemap_changed)
 
     def _country(self) -> str | None:
         return normalize_country(self.country_combo.currentData())
@@ -341,10 +383,17 @@ class ParcelGpsDock(QDockWidget):
 
     def _on_outcome(self, outcome) -> None:
         if outcome.record is not None:
-            _, extent, _ = add_records(QgsProject.instance(), [outcome.record])
+            project = QgsProject.instance()
+            existing = find_results_layer(project)
+            first = existing is None or existing.featureCount() == 0
+            _, extent, _, measured = add_records(project, [outcome.record])
+            if first:
+                self._prepare_map(project)
             self.source_label.setText(tr("Source: {source}").format(source=html.escape(outcome.record.source_text())))
-            if self._task is not None and self._task.job_count == 1 and not extent.isEmpty():
-                self._zoom_to(extent)
+            if self._task is not None and self._task.job_count == 1:
+                self._show_details(measured[0] if measured else outcome.record)
+                if not extent.isEmpty():
+                    self._zoom_to(extent)
             return
         job, error = outcome.job, outcome.error
         QgsMessageLog.logMessage(
@@ -409,10 +458,62 @@ class ParcelGpsDock(QDockWidget):
 
     def _zoom_to(self, extent) -> None:
         canvas = self._iface.mapCanvas()
-        target = to_canvas_extent(QgsProject.instance(), extent, canvas.mapSettings().destinationCrs())
-        target.scale(ZOOM_MARGIN)
-        canvas.setExtent(target)
+        canvas.setExtent(framed_extent(QgsProject.instance(), extent, canvas.mapSettings().destinationCrs()))
         canvas.refresh()
+
+    def _prepare_map(self, project: QgsProject) -> None:
+        if ensure_basemap(project, self._basemap_choice()) is not None:
+            use_web_mercator(project, self._iface.mapCanvas())
+
+    def _basemap_choice(self) -> str:
+        return self.basemap_combo.currentData() or BASEMAP_SATELLITE
+
+    def _show_attribution(self) -> None:
+        basemap = basemap_for(self._basemap_choice())
+        text = tr("Basemap: {attribution}").format(attribution=html.escape(basemap.attribution)) if basemap else ""
+        self.attribution_label.setText(text)
+        self.attribution_label.setVisible(bool(text))
+
+    def _on_basemap_changed(self, _index: int) -> None:
+        choice = self._basemap_choice()
+        save_basemap(choice)
+        self._show_attribution()
+        project = QgsProject.instance()
+        layer = find_results_layer(project)
+        had_owned = owned_layer(project, BASEMAP_MARKER) is not None
+        if layer is None or (layer.featureCount() == 0 and not had_owned):
+            return
+        if replace_basemap(project, choice) is not None:
+            use_web_mercator(project, self._iface.mapCanvas())
+        self._iface.mapCanvas().refresh()
+
+    def _toggle_cadastre(self, checked: bool) -> None:
+        project = QgsProject.instance()
+        if not checked:
+            remove_cadastre_overlay(project)
+            return
+        if add_cadastre_overlay(project, find_results_layer(project)) is None:
+            self.cadastre_check.blockSignals(True)
+            self.cadastre_check.setChecked(False)
+            self.cadastre_check.blockSignals(False)
+            self._show_status(tr("The official cadastre map of Spain is not answering right now."), error=True)
+
+    def _show_details(self, record) -> None:
+        names = {
+            "reference": tr("Reference"),
+            "municipality": tr("Municipality"),
+            "area": tr("Area"),
+            "centroid": tr("Centroid"),
+        }
+        rows = "".join(
+            f'<tr><td style="color: {MUTED_COLOR}; padding-right: 8px;">{html.escape(names[key])}</td>'
+            f"<td><b>{html.escape(value)}</b></td></tr>"
+            for key, value in detail_rows(record, str(QLocale().decimalPoint()))
+        )
+        self.details_label.setText(f'<table cellspacing="0" cellpadding="1">{rows}</table>')
+        self.details_label.setVisible(True)
+        overlay = owned_layer(QgsProject.instance(), CADASTRE_MARKER) is not None
+        self.cadastre_check.setVisible(offers_cadastre_overlay(record.country) or overlay)
 
     def _zoom_to_layer(self) -> None:
         layer = find_results_layer(QgsProject.instance())

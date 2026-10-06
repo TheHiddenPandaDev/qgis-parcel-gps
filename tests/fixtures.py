@@ -96,3 +96,26 @@ AMBIGUOUS = {
     },
 }
 SERVER_ERROR = {"success": False, "code": "INTERNAL", "error": "Internal error"}
+
+URBAN_PARCEL = {
+    "success": True,
+    "data": {
+        "refCatastral": "9872023VH5797S0001WX",
+        "pais": "ES",
+        "municipio": "SANTA CRUZ DE MUDELA",
+        "provincia": "CIUDAD REAL",
+        "latitud": 38.6402423,
+        "longitud": -3.4632872,
+        "superficieParcela": 424,
+        "poligono": [
+            [38.6401335, -3.4633967],
+            [38.6401462, -3.4631766],
+            [38.6403511, -3.4631946],
+            [38.6403328, -3.4633994],
+            [38.6402683, -3.4633985],
+            [38.6402676, -3.4634075],
+            [38.6402121, -3.4634057],
+            [38.6401335, -3.4633967],
+        ],
+    },
+}

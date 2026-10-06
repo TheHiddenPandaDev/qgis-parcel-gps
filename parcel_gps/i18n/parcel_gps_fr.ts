@@ -128,6 +128,30 @@
         <translation>Annuler</translation>
     </message>
     <message>
+        <source>Map</source>
+        <translation>Carte</translation>
+    </message>
+    <message>
+        <source>Satellite (Esri)</source>
+        <translation>Satellite (Esri)</translation>
+    </message>
+    <message>
+        <source>Street map (OpenStreetMap)</source>
+        <translation>Plan (OpenStreetMap)</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Aucun</translation>
+    </message>
+    <message>
+        <source>Basemap</source>
+        <translation>Fond de carte</translation>
+    </message>
+    <message>
+        <source>Show official cadastre layer</source>
+        <translation>Afficher la couche officielle du cadastre</translation>
+    </message>
+    <message>
         <source>Zoom to results</source>
         <translation>Zoomer sur les résultats</translation>
     </message>
@@ -146,6 +170,18 @@
     <message>
         <source>Fetching...</source>
         <translation>Requête en cours...</translation>
+    </message>
+    <message>
+        <source>Municipality</source>
+        <translation>Commune</translation>
+    </message>
+    <message>
+        <source>Area</source>
+        <translation>Surface</translation>
+    </message>
+    <message>
+        <source>Centroid</source>
+        <translation>Centroïde</translation>
     </message>
     <message>
         <source>Save Parcel GPS results</source>
@@ -192,6 +228,10 @@
         <translation>Quota : {remaining} requêtes restantes ce mois-ci</translation>
     </message>
     <message>
+        <source>The official cadastre map of Spain is not answering right now.</source>
+        <translation>La carte officielle du cadastre espagnol ne répond pas pour le moment.</translation>
+    </message>
+    <message>
         <source>There are no results yet.</source>
         <translation>Aucun résultat pour l'instant.</translation>
     </message>
@@ -234,6 +274,10 @@
     <message>
         <source>Quota: {remaining} of {limit} requests left this month</source>
         <translation>Quota : {remaining} requêtes restantes sur {limit} ce mois-ci</translation>
+    </message>
+    <message>
+        <source>Basemap: {attribution}</source>
+        <translation>Fond de carte : {attribution}</translation>
     </message>
     <message>
         <source>Source: {source}</source>

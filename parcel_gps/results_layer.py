@@ -1,13 +1,12 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import datetime, timezone
 
 from qgis.core import (
     QgsCoordinateReferenceSystem,
-    QgsCoordinateTransform,
     QgsDistanceArea,
     QgsFeature,
-    QgsFillSymbol,
     QgsGeometry,
     QgsProject,
     QgsRectangle,
@@ -15,6 +14,7 @@ from qgis.core import (
 )
 
 from .core.parsing import ParcelRecord
+from .map_style import apply_parcel_style, needs_style
 
 RESULTS_LAYER_NAME = "Parcel GPS"
 RESULTS_MARKER = "parcel_gps/results"
@@ -33,12 +33,8 @@ LAYER_URI = (
     "&field=fetched_at:string(32)"
     "&index=yes"
 )
-FILL_STYLE = {
-    "color": "255,152,0,70",
-    "outline_color": "230,81,0,255",
-    "outline_width": "0.6",
-}
 AREA_DECIMALS = 1
+AREA_INDEX = 2
 
 
 def find_results_layer(project: QgsProject) -> QgsVectorLayer | None:
@@ -51,17 +47,19 @@ def find_results_layer(project: QgsProject) -> QgsVectorLayer | None:
 def results_layer(project: QgsProject) -> QgsVectorLayer:
     existing = find_results_layer(project)
     if existing is not None:
+        if needs_style(existing):
+            apply_parcel_style(existing)
         return existing
     layer = QgsVectorLayer(LAYER_URI, RESULTS_LAYER_NAME, "memory")
     layer.setCustomProperty(RESULTS_MARKER, True)
-    symbol = QgsFillSymbol.createSimple(FILL_STYLE)
-    if symbol is not None and layer.renderer() is not None:
-        layer.renderer().setSymbol(symbol)
+    apply_parcel_style(layer)
     project.addMapLayer(layer)
     return layer
 
 
-def add_records(project: QgsProject, records: list[ParcelRecord]) -> tuple[QgsVectorLayer, QgsRectangle, int]:
+def add_records(
+    project: QgsProject, records: list[ParcelRecord]
+) -> tuple[QgsVectorLayer, QgsRectangle, int, list[ParcelRecord]]:
     layer = results_layer(project)
     known = _known_keys(layer)
     area = _area_calculator(project)
@@ -70,6 +68,7 @@ def add_records(project: QgsProject, records: list[ParcelRecord]) -> tuple[QgsVe
     extent = QgsRectangle()
     extent.setMinimal()
     duplicates = 0
+    measured = []
     for record in records:
         wkt = record.to_wkt()
         if not wkt:
@@ -86,20 +85,15 @@ def add_records(project: QgsProject, records: list[ParcelRecord]) -> tuple[QgsVe
         geometry.convertToMultiType()
         feature = QgsFeature(layer.fields())
         feature.setGeometry(geometry)
-        feature.setAttributes(_attributes(record, geometry, area, fetched_at))
+        attributes = _attributes(record, geometry, area, fetched_at)
+        feature.setAttributes(attributes)
         features.append(feature)
+        measured.append(replace(record, area_m2=attributes[AREA_INDEX]))
     if features:
         layer.dataProvider().addFeatures(features)
         layer.updateExtents()
         layer.triggerRepaint()
-    return layer, extent, duplicates
-
-
-def to_canvas_extent(
-    project: QgsProject, extent: QgsRectangle, canvas_crs: QgsCoordinateReferenceSystem
-) -> QgsRectangle:
-    transform = QgsCoordinateTransform(QgsCoordinateReferenceSystem(WGS84), canvas_crs, project)
-    return transform.transformBoundingBox(extent)
+    return layer, extent, duplicates, measured
 
 
 def _known_keys(layer: QgsVectorLayer) -> set[tuple[str, str]]:

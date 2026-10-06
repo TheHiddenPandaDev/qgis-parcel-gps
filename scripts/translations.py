@@ -65,6 +65,17 @@ ES = {
     "Could not save the results: {detail}": "No se han podido guardar los resultados: {detail}",
     "Parcel GPS - cadastral parcels": "Parcel GPS - parcelas catastrales",
     "Cadastral parcels of 29 European countries": "Parcelas catastrales de 29 países europeos",
+    "Map": "Mapa",
+    "Satellite (Esri)": "Satélite (Esri)",
+    "Street map (OpenStreetMap)": "Callejero (OpenStreetMap)",
+    "None": "Ninguno",
+    "Basemap": "Mapa base",
+    "Show official cadastre layer": "Mostrar la capa oficial del Catastro",
+    "Basemap: {attribution}": "Mapa base: {attribution}",
+    "The official cadastre map of Spain is not answering right now.": "El mapa oficial del Catastro de España no responde ahora mismo.",
+    "Municipality": "Municipio",
+    "Area": "Superficie",
+    "Centroid": "Centroide",
 }
 
 FR = {
@@ -132,6 +143,17 @@ FR = {
     "Could not save the results: {detail}": "Impossible d'enregistrer les résultats : {detail}",
     "Parcel GPS - cadastral parcels": "Parcel GPS - parcelles cadastrales",
     "Cadastral parcels of 29 European countries": "Parcelles cadastrales de 29 pays européens",
+    "Map": "Carte",
+    "Satellite (Esri)": "Satellite (Esri)",
+    "Street map (OpenStreetMap)": "Plan (OpenStreetMap)",
+    "None": "Aucun",
+    "Basemap": "Fond de carte",
+    "Show official cadastre layer": "Afficher la couche officielle du cadastre",
+    "Basemap: {attribution}": "Fond de carte : {attribution}",
+    "The official cadastre map of Spain is not answering right now.": "La carte officielle du cadastre espagnol ne répond pas pour le moment.",
+    "Municipality": "Commune",
+    "Area": "Surface",
+    "Centroid": "Centroïde",
 }
 
 DE = {
@@ -201,6 +223,17 @@ DE = {
     "Could not save the results: {detail}": "Ergebnisse konnten nicht gespeichert werden: {detail}",
     "Parcel GPS - cadastral parcels": "Parcel GPS - Flurstücke",
     "Cadastral parcels of 29 European countries": "Flurstücke aus 29 europäischen Ländern",
+    "Map": "Karte",
+    "Satellite (Esri)": "Satellit (Esri)",
+    "Street map (OpenStreetMap)": "Straßenkarte (OpenStreetMap)",
+    "None": "Keine",
+    "Basemap": "Hintergrundkarte",
+    "Show official cadastre layer": "Amtlichen Katasterlayer anzeigen",
+    "Basemap: {attribution}": "Hintergrundkarte: {attribution}",
+    "The official cadastre map of Spain is not answering right now.": "Die amtliche Katasterkarte Spaniens antwortet gerade nicht.",
+    "Municipality": "Gemeinde",
+    "Area": "Fläche",
+    "Centroid": "Schwerpunkt",
 }
 
 IT = {
@@ -268,6 +301,17 @@ IT = {
     "Could not save the results: {detail}": "Impossibile salvare i risultati: {detail}",
     "Parcel GPS - cadastral parcels": "Parcel GPS - particelle catastali",
     "Cadastral parcels of 29 European countries": "Particelle catastali di 29 paesi europei",
+    "Map": "Mappa",
+    "Satellite (Esri)": "Satellite (Esri)",
+    "Street map (OpenStreetMap)": "Stradale (OpenStreetMap)",
+    "None": "Nessuna",
+    "Basemap": "Mappa di base",
+    "Show official cadastre layer": "Mostra il livello ufficiale del catasto",
+    "Basemap: {attribution}": "Mappa di base: {attribution}",
+    "The official cadastre map of Spain is not answering right now.": "La mappa ufficiale del catasto spagnolo non risponde in questo momento.",
+    "Municipality": "Comune",
+    "Area": "Superficie",
+    "Centroid": "Centroide",
 }
 
 LANGUAGES = {"es": ES, "fr": FR, "de": DE, "it": IT}

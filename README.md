@@ -4,6 +4,8 @@ A QGIS plugin that adds **official cadastral parcels from 29 European countries*
 polygons, with their reference, country, area, municipality and source. It uses the
 [Parcel GPS API](https://www.parcelgps.com/developers).
 
+![A parcel fetched with Parcel GPS over satellite imagery](docs/map.jpg)
+
 - **By reference**: type a cadastral reference (the country is detected, or pick it).
 - **On the map**: click anywhere and get the parcel under the cursor, in any project CRS.
 - **In batch**: choose a table (CSV, spreadsheet, any layer) and the field that holds the references,
@@ -14,6 +16,16 @@ polygons, with their reference, country, area, municipality and source. It uses 
   `reference`, `country`, `area_m2`, `municipality`, `province`, `address`, `latitude`, `longitude`,
   `source` and `fetched_at`. Save it as GeoPackage, GeoJSON, Shapefile or KML with **Save results...**,
   or with *Make Permanent* in QGIS.
+- **Ready to read**: when the project has no basemap yet, the first result adds one under the
+  parcels: satellite imagery (Esri World Imagery) by default, or OpenStreetMap, or none, chosen in the
+  **Map** box of the panel and remembered. The map switches to Web Mercator (EPSG:3857) and frames
+  the parcel with a margin. If your project already has a basemap or any raster layer, nothing is
+  added. Parcels are drawn in translucent blue with a strong outline and labelled with their
+  reference and area (m² below one hectare, ha above), with a halo that keeps them legible over
+  imagery. The panel shows the reference, municipality, area and centroid of the last parcel.
+- **Official cadastre on top (Spain)**: for Spanish results, tick **Show official cadastre layer** to
+  add the Catastro INSPIRE WMS (`CP.CadastralParcel`) and see the neighbouring parcels. It is off by
+  default.
 - Clear messages for a bad API key, an exhausted quota, rate limits, countries without coverage and
   ambiguous references.
 - The interface is in English, Spanish, French, German and Italian, following your QGIS language.
@@ -31,6 +43,19 @@ works by coordinates only.
 
 The data comes from the official cadastre of each country. The `source` field and the panel show the
 attribution that the API returns.
+
+## Basemaps and attribution
+
+| Option | Source | Attribution |
+|---|---|---|
+| Satellite (default) | Esri World Imagery | Esri, Maxar, Earthstar Geographics |
+| Street map | OpenStreetMap standard tiles | © OpenStreetMap contributors |
+| Official cadastre (Spain, optional overlay) | Dirección General del Catastro, INSPIRE WMS | Dirección General del Catastro |
+
+The attribution is stored in each layer's metadata and shown in the panel. Tiles are fetched only for
+the area you are looking at, through the QGIS network stack and its cache; the plugin never
+downloads tiles in bulk, in line with the
+[OpenStreetMap tile usage policy](https://operations.osmfoundation.org/policies/tiles/).
 
 ## Get an API key
 
@@ -76,10 +101,11 @@ python scripts/build_translations.py  # needs lrelease (pip install pyside6-esse
 python scripts/build_zip.py         # dist/parcel_gps-<version>.zip, ready for plugins.qgis.org
 ```
 
-`parcel_gps/core` has no QGIS imports: it holds the API client, response parsing, batch runner and
-error mapping, and it is fully covered by tests. The QGIS side (`dock.py`, `fetch_task.py`,
-`results_layer.py`, `qgis_transport.py`) builds the panel, runs requests in a `QgsTask` and writes
-the layer.
+`parcel_gps/core` has no QGIS imports: it holds the API client, response parsing, batch runner,
+error mapping and the presentation rules (style, label expression, area format, basemap catalogue and
+detection), and it is fully covered by tests. The QGIS side (`dock.py`, `fetch_task.py`,
+`results_layer.py`, `map_style.py`, `basemap.py`, `qgis_transport.py`) builds the panel, runs requests
+in a `QgsTask`, writes and styles the layer and adds the basemap.
 
 ## Licence
 

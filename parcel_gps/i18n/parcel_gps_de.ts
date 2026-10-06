@@ -128,6 +128,30 @@
         <translation>Abbrechen</translation>
     </message>
     <message>
+        <source>Map</source>
+        <translation>Karte</translation>
+    </message>
+    <message>
+        <source>Satellite (Esri)</source>
+        <translation>Satellit (Esri)</translation>
+    </message>
+    <message>
+        <source>Street map (OpenStreetMap)</source>
+        <translation>Straßenkarte (OpenStreetMap)</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Keine</translation>
+    </message>
+    <message>
+        <source>Basemap</source>
+        <translation>Hintergrundkarte</translation>
+    </message>
+    <message>
+        <source>Show official cadastre layer</source>
+        <translation>Amtlichen Katasterlayer anzeigen</translation>
+    </message>
+    <message>
         <source>Zoom to results</source>
         <translation>Auf Ergebnisse zoomen</translation>
     </message>
@@ -146,6 +170,18 @@
     <message>
         <source>Fetching...</source>
         <translation>Wird abgerufen...</translation>
+    </message>
+    <message>
+        <source>Municipality</source>
+        <translation>Gemeinde</translation>
+    </message>
+    <message>
+        <source>Area</source>
+        <translation>Fläche</translation>
+    </message>
+    <message>
+        <source>Centroid</source>
+        <translation>Schwerpunkt</translation>
     </message>
     <message>
         <source>Save Parcel GPS results</source>
@@ -192,6 +228,10 @@
         <translation>Kontingent: noch {remaining} Anfragen in diesem Monat</translation>
     </message>
     <message>
+        <source>The official cadastre map of Spain is not answering right now.</source>
+        <translation>Die amtliche Katasterkarte Spaniens antwortet gerade nicht.</translation>
+    </message>
+    <message>
         <source>There are no results yet.</source>
         <translation>Noch keine Ergebnisse.</translation>
     </message>
@@ -234,6 +274,10 @@
     <message>
         <source>Quota: {remaining} of {limit} requests left this month</source>
         <translation>Kontingent: noch {remaining} von {limit} Anfragen in diesem Monat</translation>
+    </message>
+    <message>
+        <source>Basemap: {attribution}</source>
+        <translation>Hintergrundkarte: {attribution}</translation>
     </message>
     <message>
         <source>Source: {source}</source>

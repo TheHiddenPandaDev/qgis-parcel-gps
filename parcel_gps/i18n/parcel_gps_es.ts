@@ -128,6 +128,30 @@
         <translation>Cancelar</translation>
     </message>
     <message>
+        <source>Map</source>
+        <translation>Mapa</translation>
+    </message>
+    <message>
+        <source>Satellite (Esri)</source>
+        <translation>Satélite (Esri)</translation>
+    </message>
+    <message>
+        <source>Street map (OpenStreetMap)</source>
+        <translation>Callejero (OpenStreetMap)</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Ninguno</translation>
+    </message>
+    <message>
+        <source>Basemap</source>
+        <translation>Mapa base</translation>
+    </message>
+    <message>
+        <source>Show official cadastre layer</source>
+        <translation>Mostrar la capa oficial del Catastro</translation>
+    </message>
+    <message>
         <source>Zoom to results</source>
         <translation>Zoom a los resultados</translation>
     </message>
@@ -146,6 +170,18 @@
     <message>
         <source>Fetching...</source>
         <translation>Consultando...</translation>
+    </message>
+    <message>
+        <source>Municipality</source>
+        <translation>Municipio</translation>
+    </message>
+    <message>
+        <source>Area</source>
+        <translation>Superficie</translation>
+    </message>
+    <message>
+        <source>Centroid</source>
+        <translation>Centroide</translation>
     </message>
     <message>
         <source>Save Parcel GPS results</source>
@@ -192,6 +228,10 @@
         <translation>Cuota: quedan {remaining} consultas este mes</translation>
     </message>
     <message>
+        <source>The official cadastre map of Spain is not answering right now.</source>
+        <translation>El mapa oficial del Catastro de España no responde ahora mismo.</translation>
+    </message>
+    <message>
         <source>There are no results yet.</source>
         <translation>Todavía no hay resultados.</translation>
     </message>
@@ -234,6 +274,10 @@
     <message>
         <source>Quota: {remaining} of {limit} requests left this month</source>
         <translation>Cuota: quedan {remaining} de {limit} consultas este mes</translation>
+    </message>
+    <message>
+        <source>Basemap: {attribution}</source>
+        <translation>Mapa base: {attribution}</translation>
     </message>
     <message>
         <source>Source: {source}</source>
