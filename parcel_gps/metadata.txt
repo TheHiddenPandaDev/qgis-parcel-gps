@@ -1,0 +1,20 @@
+[general]
+name=Parcel GPS – Cadastral parcels of Europe
+qgisMinimumVersion=3.22
+qgisMaximumVersion=3.99
+description=Official cadastral parcels from 29 European countries as polygon layers: by cadastral reference, by clicking on the map, or in batch from a table.
+version=0.1.0
+author=The Hidden Panda
+email=dani@catastrogps.es
+about=Parcel GPS brings official cadastral parcels into QGIS. Type a cadastral reference, click on the map or pick a field of references in any table, and the plugin adds each parcel to a "Parcel GPS" polygon layer (EPSG:4326) with its outline, reference, country, area, municipality and the official source. Coverage: 29 European countries (Spain with the Basque Country and Navarre foral cadastres, Portugal, France, Italy, Germany, Austria, Poland, the Netherlands, Belgium, the Nordic and Baltic countries and more); by reference in 27 of them and by coordinates in all 29. This plugin uses the Parcel GPS web API, an external service run by The Hidden Panda: you need an API key. The free plan gives 250 requests a month; paid plans start at 19 EUR a month. Get a key at https://www.parcelgps.com/developers. The data comes from the official cadastres of each country. No extra Python packages are needed.
+tracker=https://github.com/TheHiddenPandaDev/qgis-parcel-gps/issues
+repository=https://github.com/TheHiddenPandaDev/qgis-parcel-gps
+homepage=https://github.com/TheHiddenPandaDev/qgis-parcel-gps
+changelog=0.1.0 First release: search by cadastral reference, pick on the map, batch from a table with progress and rate-limit handling, save results; English, Spanish, French, German and Italian.
+tags=cadastre,cadastral,parcel,land registry,property,europe,spain,portugal,france,italy,germany,api,web service,geojson
+category=Web
+icon=icon.png
+experimental=False
+deprecated=False
+hasProcessingProvider=no
+server=False
