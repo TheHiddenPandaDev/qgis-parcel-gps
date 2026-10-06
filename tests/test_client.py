@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pytest
-from conftest import API_KEY, json_response
+from conftest import API_KEY, FakeTransport, json_response
 from fixtures import (
     AMBIGUOUS,
     BURST_LIMITED,
@@ -94,11 +94,11 @@ def test_custom_base_url_is_trimmed(make_client):
 @pytest.mark.parametrize("key", ["", "   ", None])
 def test_missing_key_is_rejected(key):
     with pytest.raises(ValidationError):
-        ParcelGpsClient(key)
+        ParcelGpsClient(key, transport=FakeTransport())
 
 
 def test_repr_never_shows_the_key():
-    client = ParcelGpsClient(API_KEY)
+    client = ParcelGpsClient(API_KEY, transport=FakeTransport())
 
     assert API_KEY not in repr(client)
     assert "***" in repr(client)

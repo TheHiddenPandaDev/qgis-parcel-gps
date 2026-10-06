@@ -4,21 +4,21 @@ from qgis.core import QgsSettings
 
 from .core.presentation import DEFAULT_BASEMAP, normalize_basemap_choice
 
-API_KEY_SETTING = "parcel_gps/api_key"
+CREDENTIAL_SETTING = "parcel_gps/api_key"
 COUNTRY_SETTING = "parcel_gps/country"
 BASEMAP_SETTING = "parcel_gps/basemap"
 
 
 def load_api_key() -> str:
-    return str(QgsSettings().value(API_KEY_SETTING, "") or "").strip()
+    return str(QgsSettings().value(CREDENTIAL_SETTING, "") or "").strip()
 
 
 def save_api_key(api_key: str) -> None:
     settings = QgsSettings()
     if api_key.strip():
-        settings.setValue(API_KEY_SETTING, api_key.strip())
+        settings.setValue(CREDENTIAL_SETTING, api_key.strip())
     else:
-        settings.remove(API_KEY_SETTING)
+        settings.remove(CREDENTIAL_SETTING)
 
 
 def load_country() -> str:

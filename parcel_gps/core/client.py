@@ -15,7 +15,7 @@ from .errors import (
     ValidationError,
     error_from_response,
 )
-from .transport import HttpResponse, Transport, TransportFailure, TransportTimeout, urllib_transport
+from .transport import HttpResponse, Transport, TransportFailure, TransportTimeout
 
 DEFAULT_BASE_URL = "https://api.parcelgps.com"
 DEVELOPER_PORTAL_URL = "https://www.parcelgps.com/developers"
@@ -25,7 +25,7 @@ BACKOFF_BASE_SECONDS = 1.0
 RETRYABLE_STATUS = frozenset({502, 503, 504})
 MAX_REFERENCE_LENGTH = 64
 HTTP_OK_MAX = 299
-PLUGIN_VERSION = "0.3.0"
+PLUGIN_VERSION = "0.3.1"
 USER_AGENT = f"parcel-gps-qgis/{PLUGIN_VERSION}"
 
 
@@ -34,9 +34,9 @@ class ParcelGpsClient:
         self,
         api_key: str,
         *,
+        transport: Transport,
         base_url: str = DEFAULT_BASE_URL,
         timeout: float = DEFAULT_TIMEOUT_SECONDS,
-        transport: Transport | None = None,
         max_retries: int = DEFAULT_MAX_RETRIES,
         sleep: Callable[[float], None] = time.sleep,
         user_agent: str = USER_AGENT,
@@ -47,7 +47,7 @@ class ParcelGpsClient:
         self._api_key = key
         self._base_url = base_url.rstrip("/")
         self._timeout = timeout
-        self._transport = transport or urllib_transport
+        self._transport = transport
         self._max_retries = max(0, max_retries)
         self._sleep = sleep
         self._user_agent = user_agent

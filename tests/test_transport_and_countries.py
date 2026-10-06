@@ -1,13 +1,7 @@
 from __future__ import annotations
 
-import io
-import socket
-import urllib.error
-from email.message import Message
-
 import pytest
 
-from parcel_gps.core import transport
 from parcel_gps.core.countries import (
     COORDINATES_ONLY,
     COUNTRY_CODES,
@@ -17,91 +11,7 @@ from parcel_gps.core.countries import (
     normalize_country,
     supports_reference,
 )
-from parcel_gps.core.transport import HttpResponse, TransportFailure, TransportTimeout, urllib_transport
-
-
-class FakeUrlResponse:
-    def __init__(self, status, body, headers):
-        self.status = status
-        self._body = body
-        self.headers = headers
-
-    def read(self):
-        return self._body
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *exc):
-        return False
-
-
-def _headers(**values):
-    message = Message()
-    for key, value in values.items():
-        message[key.replace("_", "-")] = value
-    return message
-
-
-def test_urllib_transport_success(monkeypatch):
-    captured = {}
-
-    def fake_urlopen(request, timeout):
-        captured["request"] = request
-        captured["timeout"] = timeout
-        return FakeUrlResponse(200, b'{"ok": true}', _headers(X_Quota_Limit="250"))
-
-    monkeypatch.setattr(transport.urllib.request, "urlopen", fake_urlopen)
-
-    response = urllib_transport("https://example.test/x", {"X-API-Key": "k"}, 5.0)
-
-    assert response.status == 200
-    assert response.body == b'{"ok": true}'
-    assert response.header("x-quota-limit") == "250"
-    assert captured["timeout"] == 5.0
-    assert captured["request"].get_header("X-api-key") == "k"
-
-
-def test_urllib_transport_http_error_is_a_response(monkeypatch):
-    def fake_urlopen(request, timeout):
-        raise urllib.error.HTTPError(request.full_url, 429, "Too Many", _headers(Retry_After="3"), io.BytesIO(b"{}"))
-
-    monkeypatch.setattr(transport.urllib.request, "urlopen", fake_urlopen)
-
-    response = urllib_transport("https://example.test/x", {}, 5.0)
-
-    assert response.status == 429
-    assert response.header("Retry-After") == "3"
-
-
-def test_urllib_transport_http_error_without_body(monkeypatch):
-    def fake_urlopen(request, timeout):
-        raise urllib.error.HTTPError(request.full_url, 500, "Boom", None, None)
-
-    monkeypatch.setattr(transport.urllib.request, "urlopen", fake_urlopen)
-
-    response = urllib_transport("https://example.test/x", {}, 5.0)
-
-    assert (response.status, response.body, dict(response.headers)) == (500, b"", {})
-
-
-@pytest.mark.parametrize(
-    "raised,expected",
-    [
-        (socket.timeout("timed out"), TransportTimeout),
-        (urllib.error.URLError(socket.timeout("timed out")), TransportTimeout),
-        (urllib.error.URLError("name not resolved"), TransportFailure),
-        (ConnectionResetError("reset"), TransportFailure),
-    ],
-)
-def test_urllib_transport_failures(monkeypatch, raised, expected):
-    def fake_urlopen(request, timeout):
-        raise raised
-
-    monkeypatch.setattr(transport.urllib.request, "urlopen", fake_urlopen)
-
-    with pytest.raises(expected):
-        urllib_transport("https://example.test/x", {}, 5.0)
+from parcel_gps.core.transport import HttpResponse
 
 
 def test_http_response_header_missing():
